@@ -1,3 +1,5 @@
+import 'package:crudmasterevaluacion/clean_architecture/helper/size_config.dart';
+import 'package:crudmasterevaluacion/clean_architecture/presentation/provider/employee/employee_screen.dart';
 import 'package:crudmasterevaluacion/clean_architecture/presentation/provider/home/home_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -23,12 +25,18 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
   }
 
-  void _incrementCounter() {}
+  void _openMaintenance() async {
+    await Navigator.of(context).push(MaterialPageRoute(
+      builder: (context) {
+        return EmployeeScreen.init(context, false);
+      },
+    ));
+  }
 
   @override
   Widget build(BuildContext context) {
     final homeBloc = context.watch<HomeBloc>();
-
+    SizeConfig().init(context);
     return Scaffold(
       // appBar: AppBar(
       //   title: Text("MAIN"),
@@ -46,7 +54,8 @@ class _HomeScreenState extends State<HomeScreen> {
               (context, index) {
                 final employee = homeBloc.employees[index];
                 // final fechaIngreso = DateTime.parse(employee.fechaIngreso!.toString());
-                final fechaIngreso = "${employee.fechaIngreso!.day}/${employee.fechaIngreso!.month}/${employee.fechaIngreso!.year}";
+                final fechaIngreso =
+                    "${employee.fechaIngreso!.day}/${employee.fechaIngreso!.month}/${employee.fechaIngreso!.year}";
                 return ListTile(
                   title: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -58,11 +67,15 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                   contentPadding: const EdgeInsets.all(10.0),
-                  onTap: () {
-
+                  onTap: () async {
+                    await Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) {
+                        return EmployeeScreen.init(context, true);
+                      },
+                    ));
                   },
                   isThreeLine: false,
-                  leading: Icon(Icons.supervised_user_circle_sharp, size: 48),
+                  leading: const Icon(Icons.supervised_user_circle_sharp, size: 48),
                   shape: const Border(
                     bottom: BorderSide(),
                   ),
@@ -73,8 +86,8 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
+        onPressed: _openMaintenance,
+        tooltip: 'Nuevo Empleado',
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
