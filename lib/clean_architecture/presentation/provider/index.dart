@@ -1,6 +1,6 @@
+import 'package:crudmasterevaluacion/clean_architecture/domain/repository/employee_repository.dart';
 import 'package:crudmasterevaluacion/clean_architecture/presentation/provider/home/home_bloc.dart';
 import 'package:crudmasterevaluacion/clean_architecture/presentation/provider/home/home_screen.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -10,7 +10,7 @@ class Index extends StatelessWidget {
   static Widget init(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => HomeBloc(
-        //  localRepositoryInterface: context.read<LocalRepositoryInterface>(),
+        employeeInterface: context.read<EmployeeInterface>(),
       ),
       builder: (context, child) => const Index._(),
     );
