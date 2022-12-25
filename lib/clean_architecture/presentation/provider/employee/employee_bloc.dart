@@ -25,6 +25,7 @@ class EmployedBloc extends ChangeNotifier {
 
   String employeeId = "0";
   bool isUpdated = false;
+  int daysBetween = 0;
 
   void removeError({required String error}) {
     List<String> values = List.from(errors.value);
@@ -61,12 +62,23 @@ class EmployedBloc extends ChangeNotifier {
     nameController.text = employee.nombre!;
     lastnameController.text = employee.apellido!;
     ageController.text = employee.edad!;
-    birthDayController.text = handleFormatDateTime(employee.fechaNacimiento!);
-    admissionDateController.text = handleFormatDateTime(employee.fechaIngreso!);
-    contractEndDateController.text = handleFormatDateTime(employee.fechaTerminoContrato!);
+    birthDayController.text = getFormatDateTime(employee.fechaNacimiento!);
+    admissionDateController.text = getFormatDateTime(employee.fechaIngreso!);
+    contractEndDateController.text =
+        getFormatDateTime(employee.fechaTerminoContrato!);
+
+    daysBetween =
+        getDaysBetween(employee.fechaIngreso!, employee.fechaTerminoContrato!);
+    notifyListeners();
   }
 
-  String handleFormatDateTime(DateTime dateTime) =>
+  int getDaysBetween(DateTime from, DateTime to) {
+    from = DateTime(from.year, from.month, from.day);
+    to = DateTime(to.year, to.month, to.day);
+    return (to.difference(from).inHours / 24).round();
+  }
+
+  String getFormatDateTime(DateTime dateTime) =>
       "${dateTime.year}-${dateTime.month}-${dateTime.day}";
 
   void onChangeName(String value) {
@@ -109,6 +121,13 @@ class EmployedBloc extends ChangeNotifier {
     if (value!.isEmpty) {
       addError(error: kAgeNullError);
       return "";
+    }
+
+    if (int.parse(value) < 18) {
+      addError(error: kAdultNullError);
+      return "";
+    } else {
+      removeError(error: kAdultNullError);
     }
 
     return null;

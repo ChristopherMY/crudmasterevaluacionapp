@@ -25,13 +25,13 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _openMaintenance() async {
+    final homeBloc = context.read<HomeBloc>();
     await Navigator.of(context).push(MaterialPageRoute(
       builder: (context) {
         return EmployeeScreen.init(context, false, "1");
       },
     ));
 
-    final homeBloc = context.read<HomeBloc>();
     homeBloc.loadEmployees(context);
   }
 
@@ -76,6 +76,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               context, true, employee.idEmpleado.toString());
                         },
                       ));
+                      homeBloc.loadEmployees(context);
                     },
                     isThreeLine: false,
                     leading: const Icon(
@@ -83,7 +84,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       size: 48,
                     ),
                     trailing: GestureDetector(
-                      onTap: () => homeBloc.deleteEmployed(employedId:  employee.idEmpleado),
+                      onTap: () => homeBloc.deleteEmployed(
+                        context,
+                        employedId: employee.idEmpleado.toString(),
+                      ),
                       child: const Icon(
                         Icons.restore_from_trash,
                         color: Colors.red,
