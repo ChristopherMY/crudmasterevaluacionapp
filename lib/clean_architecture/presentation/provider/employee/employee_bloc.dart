@@ -51,6 +51,7 @@ class EmployedBloc extends ChangeNotifier {
     if (response.data == null) {
       GlobalSnackBar.showWarningSnackBar(
           context, "Tuvimos un problema, vuelva a intentarlo mas tarde.");
+      context.loaderOverlay.hide();
       return;
     }
     context.loaderOverlay.hide();
@@ -62,8 +63,7 @@ class EmployedBloc extends ChangeNotifier {
     ageController.text = employee.edad!;
     birthDayController.text = handleFormatDateTime(employee.fechaNacimiento!);
     admissionDateController.text = handleFormatDateTime(employee.fechaIngreso!);
-    contractEndDateController.text =
-        handleFormatDateTime(employee.fechaTerminoContrato!);
+    contractEndDateController.text = handleFormatDateTime(employee.fechaTerminoContrato!);
   }
 
   String handleFormatDateTime(DateTime dateTime) =>
@@ -180,8 +180,8 @@ class EmployedBloc extends ChangeNotifier {
     DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: initialDate,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2101),
+      firstDate: DateTime(1970),
+      lastDate: DateTime(2050),
     );
 
     if (pickedDate != null) {
@@ -225,6 +225,7 @@ class EmployedBloc extends ChangeNotifier {
       if (response.data == null) {
         print(response.error!.data!);
         GlobalSnackBar.showErrorSnackBarIcon(context, kResponseError);
+        context.loaderOverlay.hide();
         return;
       }
 

@@ -11,17 +11,16 @@ class HomeBloc extends ChangeNotifier {
   List<Employee> employees = [];
 
   void loadEmployees(BuildContext context) async {
-
-    context.loaderOverlay.show();
-    employees = await getEmployees();
-    context.loaderOverlay.hide();
+    employees = await getEmployees(context);
     notifyListeners();
   }
 
-  Future<List<Employee>> getEmployees() async {
+  Future<List<Employee>> getEmployees(BuildContext context) async {
+    context.loaderOverlay.show();
     final response = await employeeInterface.getEmployees();
 
     if (response.data == null) {
+      context.loaderOverlay.hide();
       return [];
     }
 
@@ -33,5 +32,15 @@ class HomeBloc extends ChangeNotifier {
     }
 
     return [];
+  }
+
+  void deleteEmployed({required String employedId}) async{
+
+    final response = await employeeInterface.getEmployees();
+
+    if (response.data == null) {
+      context.loaderOverlay.hide();
+      return;
+    }
   }
 }

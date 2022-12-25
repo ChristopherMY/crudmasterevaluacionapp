@@ -47,7 +47,7 @@ class EmployeeService implements EmployeeInterface {
     required Map<String, dynamic> employee,
   }) async {
     return await _dio.request(
-      "$_url/api/v1/empleados/",
+      "$_url/api/v1/empleados",
       method: "PUT",
       data: employee,
     );

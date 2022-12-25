@@ -56,8 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 childCount: homeBloc.employees.length,
                 (context, index) {
                   final employee = homeBloc.employees[index];
-                  // final fechaIngreso = DateTime.parse(employee.fechaIngreso!.toString());
-                  final fechaIngreso =
+                  final admissionDate =
                       "${employee.fechaIngreso!.day}/${employee.fechaIngreso!.month}/${employee.fechaIngreso!.year}";
                   return ListTile(
                     title: Column(
@@ -66,20 +65,31 @@ class _HomeScreenState extends State<HomeScreen> {
                         Text("Nombre: ${employee.nombre}"),
                         Text("Apellido: ${employee.apellido}"),
                         Text("Edad: ${employee.edad}"),
-                        Text("Fecha de Ingreso: $fechaIngreso"),
+                        Text("Fecha de Ingreso: $admissionDate"),
                       ],
                     ),
                     contentPadding: const EdgeInsets.all(10.0),
                     onTap: () async {
                       await Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) {
-                          return EmployeeScreen.init(context, true, employee.idEmpleado.toString());
+                          return EmployeeScreen.init(
+                              context, true, employee.idEmpleado.toString());
                         },
                       ));
                     },
                     isThreeLine: false,
-                    leading: const Icon(Icons.supervised_user_circle_sharp,
-                        size: 48),
+                    leading: const Icon(
+                      Icons.supervised_user_circle_sharp,
+                      size: 48,
+                    ),
+                    trailing: GestureDetector(
+                      onTap: () => homeBloc.deleteEmployed(employedId:  employee.idEmpleado),
+                      child: const Icon(
+                        Icons.restore_from_trash,
+                        color: Colors.red,
+                        size: 48,
+                      ),
+                    ),
                     shape: const Border(
                       bottom: BorderSide(),
                     ),
