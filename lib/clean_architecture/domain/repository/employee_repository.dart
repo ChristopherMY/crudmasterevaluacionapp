@@ -5,7 +5,7 @@ abstract class EmployeeInterface {
   Future<HttpResponse> getEmployees();
 
   Future<HttpResponse> addEmployee({
-    required Employee employee,
+    required Map<String, dynamic> employee,
   });
 
   Future<HttpResponse> findEmployee({
@@ -13,7 +13,7 @@ abstract class EmployeeInterface {
   });
 
   Future<HttpResponse> updateEmployee({
-    required Employee employee,
+    required Map<String, dynamic> employee,
   });
 
   Future<HttpResponse> deleteEmployee({

@@ -1,16 +1,17 @@
 import 'package:crudmasterevaluacion/clean_architecture/domain/model/employee_model.dart';
 import 'package:crudmasterevaluacion/clean_architecture/domain/repository/employee_repository.dart';
 import 'package:crudmasterevaluacion/clean_architecture/helper/constants.dart';
+import 'package:crudmasterevaluacion/clean_architecture/helper/http_response.dart';
 import 'package:crudmasterevaluacion/clean_architecture/helper/keyboard.dart';
+import 'package:crudmasterevaluacion/clean_architecture/presentation/util/global_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 
 class EmployedBloc extends ChangeNotifier {
   final EmployeeInterface employeeInterface;
 
   EmployedBloc({required this.employeeInterface});
-
-  late Employee employee;
 
   ValueNotifier<List<String>> errors = ValueNotifier([]);
   TextEditingController nameController = TextEditingController();
@@ -42,17 +43,31 @@ class EmployedBloc extends ChangeNotifier {
   }
 
   Future<void> findEmployee({
-    required String employeeId,
     required BuildContext context,
   }) async {
+    context.loaderOverlay.show();
     final response =
         await employeeInterface.findEmployee(employeeId: employeeId);
     if (response.data == null) {
+      GlobalSnackBar.showWarningSnackBar(
+          context, "Tuvimos un problema, vuelva a intentarlo mas tarde.");
       return;
     }
+    context.loaderOverlay.hide();
 
-    employee = Employee.fromMap(response.data);
+    Employee employee = Employee.fromMap(response.data);
+
+    nameController.text = employee.nombre!;
+    lastnameController.text = employee.apellido!;
+    ageController.text = employee.edad!;
+    birthDayController.text = handleFormatDateTime(employee.fechaNacimiento!);
+    admissionDateController.text = handleFormatDateTime(employee.fechaIngreso!);
+    contractEndDateController.text =
+        handleFormatDateTime(employee.fechaTerminoContrato!);
   }
+
+  String handleFormatDateTime(DateTime dateTime) =>
+      "${dateTime.year}-${dateTime.month}-${dateTime.day}";
 
   void onChangeName(String value) {
     if (value.isNotEmpty) {
@@ -113,8 +128,9 @@ class EmployedBloc extends ChangeNotifier {
 
     if (value.isNotEmpty) {
       removeError(error: kBirthDayNullError);
-      return "";
+      return null;
     }
+
     return null;
   }
 
@@ -130,10 +146,9 @@ class EmployedBloc extends ChangeNotifier {
       return "";
     }
 
-
     if (value.isNotEmpty) {
       removeError(error: kAdmissionDateNullError);
-      return "";
+      return null;
     }
     return null;
   }
@@ -152,7 +167,7 @@ class EmployedBloc extends ChangeNotifier {
 
     if (value.isNotEmpty) {
       removeError(error: kContractEndNullError);
-      return "";
+      return null;
     }
 
     return null;
@@ -182,28 +197,42 @@ class EmployedBloc extends ChangeNotifier {
     if (formKey.currentState!.validate()) {
       KeyboardUtil.hideKeyboard(context);
 
-      if (errors.value.isNotEmpty) return;
-
-      formKey.currentState!.save();
-      final employed = Employee(
-        idEmpleado: "",
-        nombre: nameController.text,
-        apellido: lastnameController.text,
-        edad: ageController.text,
-        fechaIngreso: DateTime.parse(admissionDateController.text),
-        fechaNacimiento: DateTime.parse(birthDayController.text),
-        fechaTerminoContrato: DateTime.parse(contractEndDateController.text),
-        flgEstd: "1",
-      );
-
-      if (isUpdated) {
-        final response =
-            await employeeInterface.updateEmployee(employee: employee);
+      if (errors.value.isNotEmpty) {
+        GlobalSnackBar.showInfoSnackBarIcon(context, kResponseError);
         return;
       }
 
-      final response = await employeeInterface.addEmployee(employee: employee);
-      return;
+      formKey.currentState!.save();
+      context.loaderOverlay.show();
+      final Map<String, dynamic> employed = {
+        "id_empleado": employeeId,
+        "nombre": nameController.text,
+        "apellido": lastnameController.text,
+        "edad": ageController.text,
+        "fecha_nacimiento": birthDayController.text,
+        "fecha_ingreso": admissionDateController.text,
+        "fecha_termino_contrato": contractEndDateController.text,
+        "flg_estd": "1"
+      };
+
+      final HttpResponse response;
+      if (isUpdated) {
+        response = await employeeInterface.updateEmployee(employee: employed);
+      } else {
+        response = await employeeInterface.addEmployee(employee: employed);
+      }
+
+      if (response.data == null) {
+        print(response.error!.data!);
+        GlobalSnackBar.showErrorSnackBarIcon(context, kResponseError);
+        return;
+      }
+
+      context.loaderOverlay.hide();
+      GlobalSnackBar.showInfoSnackBarIcon(
+          context, "Los registros fueron guardados correctamente");
+
+      Navigator.of(context).pop();
     }
   }
 }

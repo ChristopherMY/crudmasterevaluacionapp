@@ -71,6 +71,7 @@ class _EmployeeFormState extends State<EmployeeForm> {
             onChanged: employedBloc.onChangeAge,
             validator: employedBloc.onValidationAge,
             style: Theme.of(context).textTheme.bodyText2,
+            maxLength: 2,
             decoration: InputDecoration(
               labelText: "Edad",
               hintText: "Ingresa la edad",
@@ -159,7 +160,7 @@ class _EmployeeFormState extends State<EmployeeForm> {
               errorStyle: const TextStyle(height: 0.0),
               suffixIcon: const Icon(Icons.calendar_today),
             ),
-            // readOnly: true,
+            readOnly: true,
             onTap: () async {
               final formattedDate = await employedBloc.handleGetDateSelection(
                   context, DateTime.now());

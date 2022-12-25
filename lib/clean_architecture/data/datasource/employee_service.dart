@@ -1,5 +1,4 @@
 import 'package:crudmasterevaluacion/clean_architecture/domain/api/environment.dart';
-import 'package:crudmasterevaluacion/clean_architecture/domain/model/employee_model.dart';
 import 'package:crudmasterevaluacion/clean_architecture/domain/repository/employee_repository.dart';
 import 'package:crudmasterevaluacion/clean_architecture/helper/http.dart';
 import 'package:crudmasterevaluacion/clean_architecture/helper/http_response.dart';
@@ -9,11 +8,11 @@ class EmployeeService implements EmployeeInterface {
   final Http _dio = Http(logsEnabled: true);
 
   @override
-  Future<HttpResponse> addEmployee({required Employee employee}) async {
+  Future<HttpResponse> addEmployee({required Map<String, dynamic> employee}) async {
     return await _dio.request(
-      "$_url/api/v1/empleados/",
+      "$_url/api/v1/empleados",
       method: "POST",
-      data: employee.toMap(),
+      data: employee,
     );
   }
 
@@ -30,7 +29,7 @@ class EmployeeService implements EmployeeInterface {
   @override
   Future<HttpResponse> findEmployee({required String employeeId}) async {
     return await _dio.request(
-      "$_url/api/v1/empleados/$employeeId",
+      "$_url/api/v1/empleados/find/$employeeId",
       method: "GET",
     );
   }
@@ -45,12 +44,12 @@ class EmployeeService implements EmployeeInterface {
 
   @override
   Future<HttpResponse> updateEmployee({
-    required Employee employee,
+    required Map<String, dynamic> employee,
   }) async {
     return await _dio.request(
       "$_url/api/v1/empleados/",
       method: "PUT",
-      data: employee.toMap(),
+      data: employee,
     );
   }
 }

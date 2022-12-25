@@ -2,32 +2,55 @@ import 'package:crudmasterevaluacion/clean_architecture/domain/repository/employ
 import 'package:crudmasterevaluacion/clean_architecture/presentation/provider/employee/components/employee_form.dart';
 import 'package:crudmasterevaluacion/clean_architecture/presentation/provider/employee/employee_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 import 'package:provider/provider.dart';
 
-class EmployeeScreen extends StatelessWidget {
-  const EmployeeScreen._({Key? key, required this.isUpdate}) : super(key: key);
+class EmployeeScreen extends StatefulWidget {
+  const EmployeeScreen._({Key? key}) : super(key: key);
 
-  final bool isUpdate;
-
-  static Widget init(BuildContext context, bool isUpdate){
+  static Widget init(BuildContext context, bool isUpdated, String employeeId) {
     return ChangeNotifierProvider<EmployedBloc>(
-      create: (context) => EmployedBloc(employeeInterface: context.read<EmployeeInterface>()),
-      builder: (context, child) => EmployeeScreen._(isUpdate: isUpdate),
+      create: (context) => EmployedBloc(
+        employeeInterface: context.read<EmployeeInterface>(),
+      )
+        ..isUpdated = isUpdated
+        ..employeeId = employeeId,
+      builder: (context, child) => const EmployeeScreen._(),
     );
   }
 
   @override
+  State<EmployeeScreen> createState() => _EmployeeScreenState();
+}
+
+class _EmployeeScreenState extends State<EmployeeScreen> {
+  void initEmployed() async {
+    final employedBloc = context.read<EmployedBloc>();
+    if (employedBloc.isUpdated) {
+      await employedBloc.findEmployee(context: context);
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    initEmployed();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(isUpdate ? "Actualizar Empleado" : "Nuevo Empleado"),
-      ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(15.0),
-        child: Column(
-          children: [
-            EmployeeForm()
-          ],
+    final employedBloc = context.read<EmployedBloc>();
+    return LoaderOverlay(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(employedBloc.isUpdated
+              ? "Actualizar Empleado"
+              : "Nuevo Empleado"),
+        ),
+        body: const SingleChildScrollView(
+          padding: EdgeInsets.all(15.0),
+          child: EmployeeForm(),
         ),
       ),
     );
